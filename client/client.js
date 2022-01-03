@@ -1,6 +1,8 @@
 const grpc = require('grpc');
 const greets = require('../server/proto/greet_pb');
+const cal = require('../server/proto/cal_pb');
 const service = require('../server/proto/greet_grpc_pb');
+const calService = require('../server/proto/cal_grpc_pb');
 
 
 function main() {
@@ -45,6 +47,44 @@ function main() {
 			console.error(error)
 		}
 	})
+
+	/////////greetManyTimes
+	// const greetManyTimesRequest = new greets.GreetManyTimesRequest();
+	// greetManyTimesRequest.setGreeting(greeting)
+	// const call = client.greetManyTimes(greetManyTimesRequest, () => { });
+
+	// call.on('data', (response) => {
+	// 	console.log('streaming response ', response.getResult())
+	// })
+	// call.on('status', status => {
+	// 	console.log(status)
+	// })
+	// call.on('error', error => console.error(error))
+	// call.on('end', () => {
+	// 	console.log('streaming ended')
+	// })
+
+	const calClient = new calService.CalculatorServiceClient(
+		"localhost:50051",
+		grpc.credentials.createInsecure()
+	)
+
+	const calRequest = new cal.PrimeNumberDecompositionRequest();
+	calRequest.setNumber(11);
+
+	const call = calClient.primeNumberDecomposition(calRequest, () => { })
+
+	call.on('data', (response) => {
+		console.log('prime factors found: ', response.getPrimeFactor())
+	})
+	call.on('status', status => {
+		console.log(status)
+	})
+	call.on('error', error => console.error(error))
+	call.on('end', () => {
+		console.log('streaming ended')
+	})
+
 }
 
 main()

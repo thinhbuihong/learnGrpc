@@ -16,6 +16,16 @@ message GreetResponse{
 service GreetService{
 	//unary API
 	rpc Greet (GreetRequest) returns (GreetResponse) {};
+
+	//streaming API
+	rpc GreetManyTimes (GreetManyTimesRequest) returns (stream GreetManyTimesResponse) {};
+}
+
+message GreetManyTimesRequest{
+	Greeting greeting=1;
+}
+message GreetManyTimesResponse{
+	string result=1;
 }
 
 //sum message
