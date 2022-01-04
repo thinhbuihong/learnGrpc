@@ -85,6 +85,28 @@ function main() {
 		console.log('streaming ended')
 	})
 
+	//longGreeting
+	const longGreetRequest = new greets.LongGreetRequest();
+	const longGreetCall = client.longGreet(longGreetRequest, (error, response) => {
+		if (!error) {
+			console.log('server response: ', response.getResult())
+		} else {
+			console.error(error)
+		}
+	})
+
+	let count = 0, intervalId = setInterval(function () {
+		console.log('sending message ' + count)
+
+		const request = new greets.LongGreetRequest();
+		request.setGreet(greeting)
+		longGreetCall.write(request)
+
+		if (++count > 3) {
+			clearInterval(intervalId);
+			longGreetCall.end()
+		}
+	}, 1000)
 }
 
 main()

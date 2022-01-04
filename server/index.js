@@ -71,12 +71,32 @@ function primeNumberDecomposition(call, callback) {
 	call.end()
 }
 
+function longGreet(call, callback) {
+	call.on('data', request => {
+		const fullName = request.getGreet().getFirstName() + ' ' +
+			request.getGreet().getLastName()
+
+		console.log('hello ', fullName);
+	})
+
+	call.on('error', error => {
+		console.error(error)
+	})
+
+	call.on('end', () => {
+		const response = new greets.LongGreetResponse();
+		response.setResult('long greet client streaming....')
+		callback(null, response)
+	})
+}
+
 function main() {
 	const server = new grpc.Server()
 
 	server.addService(service.GreetServiceService, {
 		greet,
-		greetManyTimes
+		greetManyTimes,
+		longGreet
 	})
 	server.addService(service.SumServiceService, {
 		sum,
