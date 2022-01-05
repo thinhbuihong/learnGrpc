@@ -90,13 +90,45 @@ function longGreet(call, callback) {
 	})
 }
 
+function sleep(interval) {
+	return new Promise((resolve, reject) => {
+		setTimeout(() => resolve(), interval)
+	})
+}
+async function greetEveryone(call, callback) {
+	call.on('data', response => {
+		const fullName = response.getGreet().getFirstName() + ' ' +
+			response.getGreet().getLastName()
+		console.log('hello ' + fullName)
+	})
+
+	call.on('error', error => console.error(error))
+
+	call.on('end', () => {
+		console.log('the end...')
+	})
+
+	for (let i = 0; i < 10; i++) {
+		const request = new greets.GreetEveryoneResponse();
+		request.setResult('thinhdepzai' + i)
+
+		call.write(request);
+
+		await sleep(1000)
+
+	}
+
+	call.end()
+}
+
 function main() {
 	const server = new grpc.Server()
 
 	server.addService(service.GreetServiceService, {
 		greet,
 		greetManyTimes,
-		longGreet
+		longGreet,
+		greetEveryone
 	})
 	server.addService(service.SumServiceService, {
 		sum,
@@ -108,6 +140,7 @@ function main() {
 	server.bind("127.0.0.1:50051", grpc.ServerCredentials.createInsecure())
 	server.start()
 
-	console.log('server running on port 127.0.0.1:50051')
+	console.log('server running on port 127.0.0.1:50051===')
 }
 main()
+module.exports.sleep = sleep;
