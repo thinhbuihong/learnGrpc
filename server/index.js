@@ -121,6 +121,24 @@ async function greetEveryone(call, callback) {
 	call.end()
 }
 
+function squareRoot(call, callback) {
+	const number = call.request.getNumber();
+
+	if (number >= 0) {
+		const numberRoot = Math.sqrt(number);
+		const response = new cal.SquareRootResponse();
+
+		response.setNumberRoot(numberRoot);
+		callback(null, response)
+	} else {
+		//error handling
+		return callback({
+			code: grpc.status.INVALID_ARGUMENT,
+			message: 'the number being sent is not positive'
+		})
+	}
+}
+
 function main() {
 	const server = new grpc.Server()
 
@@ -134,7 +152,8 @@ function main() {
 		sum,
 	})
 	server.addService(calService.CalculatorServiceService, {
-		primeNumberDecomposition
+		primeNumberDecomposition,
+		squareRoot
 	})
 
 	server.bind("127.0.0.1:50051", grpc.ServerCredentials.createInsecure())

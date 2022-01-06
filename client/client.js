@@ -46,6 +46,43 @@ async function bi() {
 	console.log('end client')
 }
 
+function doErrorCall() {
+	const deadline = getRPCDeadline(1)
+	const client = new calService.CalculatorServiceClient(
+		"localhost:50051",
+		grpc.credentials.createInsecure()
+	)
+
+	const squareRootRequest = new cal.SquareRootRequest();
+	squareRootRequest.setNumber(-1);
+
+	client.squareRoot(squareRootRequest, {
+		deadline
+	}, (error, response) => {
+		if (!error) {
+			console.log('square root is ', response.getNumberRoot())
+		}
+		else {
+			console.log(error.message)
+		}
+	})
+}
+
+function getRPCDeadline(rpcType) {
+	timeAllowed = 5000;
+	switch (rpcType) {
+		case 1:
+			timeAllowed = 1;
+			break;
+		case 2:
+			timeAllowed = 7000;
+			break;
+		default:
+			console.log('invalid RPC type: using default timeout')
+	}
+
+	return new Date(Date.now() + timeAllowed)
+}
 function main() {
 	// const client = new service.GreetServiceClient(
 	// 	'localhost:50051',
@@ -149,7 +186,8 @@ function main() {
 	// 	}
 	// }, 1000)
 
-	bi()
+	// bi()
+	doErrorCall()
 }
 
 main()
